@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import org.joda.money.BigMoney;
+import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
 /**
@@ -26,9 +27,9 @@ import org.joda.money.Money;
  *   MoneyCalculator.multiply(oneThird);<br/>
  * </code>
  * <p>
- * Once {@link #result()} is called, the currently active RoundingMode is
- * applied. Note that the remainder may be negative (depending on the chosen
- * RoundingMode).
+ * When result() is called, the currently active RoundingMode is applied. If
+ * result(RoundingMode) is used, the given RoundingMode will be applied. Note
+ * that the remainder may be negative (depending on the chosen RoundingMode).
  * </p>
  * <p>
  * Once the Calculator has been set - either explicitly or implicitly - all
@@ -37,12 +38,11 @@ import org.joda.money.Money;
  * CurrencyMismatchException.
  * </p>
  * 
- * @see <a
- *      href="http://joda-money.sourceforge.net/apidocs/org/joda/money/Money.html">Money</a>
- * @see <a
- *      href="http://joda-money.sourceforge.net/apidocs/org/joda/money/BigMoney.html">BigMoney</a>
- * @see <a
- *      href="http://joda-money.sourceforge.net/apidocs/org/joda/money/CurrencyUnit.html">CurrencyUnit</a>
+ * @see {@link Money}
+ * @see {@link BigMoney}
+ * @see {@link CurrencyUnit}
+ * @see {@link BigDecimal}
+ * @see {@link RoundingMode}
  */
 public class MoneyCalculator {
     PartialResult currentResult = null;
