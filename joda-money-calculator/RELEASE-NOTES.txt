@@ -1,0 +1,18 @@
+
+Joda-Money-Calculator
+================================================
+Joda-Money-Calculator is a library that adds functionality to the Joda-Money objects.
+It provides such functionality which does (and will) not exist in the Joda-Money product
+
+This is release 0.0 of Joda-Money-Calculator.
+
+The release runs on Java SE 6 or later. [Will probably run on Java SE 5, but YMMV.
+
+Joda-Money-Calculator is licensed under the business-friendly Apache License Version 2.
+This is the same license as all of Apache, plus other open source projects such as Spring.
+
+
+Feedback
+--------
+Feedback is best received using GitHub issues and Pull Requests.
+https://github.com/Gigs2Go/joda-money-calculator/

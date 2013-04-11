@@ -1,0 +1,3 @@
+Joda Money
+All code in this project is based on the use of the Joda Money project
+Ref : https://github.com/JodaOrg/joda-money
