@@ -1,18 +1,3 @@
-/*
- *  Copyright 2009-2013 Stephen Colebourne
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
 package com.gigs2go.money.calculator;
 
 import static org.junit.Assert.assertEquals;
@@ -141,10 +126,23 @@ public class TestCalculatorAllocate extends AbstractCalculatorTest {
         Money[] money = calculator.allocate( AllocatorStrategy.BACK_LOADING.getAllocator(), GBP_10_00, 3 );
         assertNotNull( money );
         assertEquals( money.length, 3 );
-        assertEquals( money[0], GBP_3_33 );
-        assertEquals( money[1], GBP_3_33 );
-        assertEquals( money[2], GBP_3_34 );
-        assertEquals( Money.total( money ), GBP_10_00 );
+        assertEquals( GBP_3_33, money[0] );
+        assertEquals( GBP_3_33, money[1] );
+        assertEquals( GBP_3_34, money[2] );
+        assertEquals( GBP_10_00, Money.total( money ) );
+    }
+
+    @Test
+    public void testAllocateRemainder () {
+        MoneyCalculator calculator = getCalculator();
+        Money[] money = calculator.allocate( AllocatorStrategy.REMAINDER.getAllocator(), GBP_10_00, 3 );
+        assertNotNull( money );
+        assertEquals( money.length, 4 );
+        assertEquals( GBP_3_33, money[0] );
+        assertEquals( GBP_3_33, money[1] );
+        assertEquals( GBP_3_33, money[2] );
+        assertEquals( GBP_0_01, money[3] );
+        assertEquals( GBP_10_00, Money.total( money ) );
     }
 
 }

@@ -3,7 +3,7 @@ package com.gigs2go.money.calculator.allocators;
 import com.gigs2go.money.calculator.Allocator;
 
 public enum AllocatorStrategy {
-    FRONT_LOADING( new FrontLoadedAllocatorImpl() ), BACK_LOADING( new BackLoadedAllocatorImpl() );
+    FRONT_LOADING( new FrontLoadedAllocatorImpl() ), BACK_LOADING( new BackLoadedAllocatorImpl() ), REMAINDER( new RemainderAllocatorImpl() );
 
     private Allocator allocator;
 

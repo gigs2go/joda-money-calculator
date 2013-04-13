@@ -22,6 +22,7 @@ public interface Constants {
     public static final Integer INT_3 = new Integer( 3 );
 
     public static final Money GBP_0_00 = Money.parse( "GBP 0.00" );
+    public static final Money GBP_0_01 = Money.parse( "GBP 0.01" );
     public static final Money GBP_1_15 = Money.parse( "GBP 1.15" );
     public static final Money GBP_1_16 = Money.parse( "GBP 1.16" );
     public static final Money GBP_1_23 = Money.parse( "GBP 1.23" );
