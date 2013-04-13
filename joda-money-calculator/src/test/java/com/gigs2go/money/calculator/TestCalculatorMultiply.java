@@ -30,19 +30,19 @@ public class TestCalculatorMultiply extends AbstractCalculatorTest {
     public void testMultiplyZeroes () {
         MoneyCalculator calculator = getCalculator();
         calculator.multiply( GBP_0_00, INT_ZERO );
-        MoneyCalculator.FinalResult result = calculator.result();
+        MoneyCalculator.Result result = calculator.result();
         assertNotNull( result );
         assertEquals( GBP_0_00, result.getValue() );
-        assertEquals( GBP_0_00.toBigMoney(), result.getRemainder() );
+        assertEquals( BIG_GBP_0_00000, result.getRemainder() );
     }
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test( expected = NullPointerException.class )
     public void testMultiplyNulls1 () {
         MoneyCalculator calculator = getCalculator();
         calculator.multiply( null, INT_ZERO );
     }
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test( expected = NullPointerException.class )
     public void testMultiplyNulls2 () {
         MoneyCalculator calculator = getCalculator();
         calculator.add( GBP_0_00, null );
@@ -52,10 +52,10 @@ public class TestCalculatorMultiply extends AbstractCalculatorTest {
     public void testMultiplyValues () {
         MoneyCalculator calculator = getCalculator();
         calculator.multiply( GBP_3_33, INT_3 );
-        MoneyCalculator.FinalResult result = calculator.result();
+        MoneyCalculator.Result result = calculator.result();
         assertNotNull( result );
         assertEquals( GBP_9_99, result.getValue() );
-        assertEquals( GBP_0_00.toBigMoney(), result.getRemainder() );
+        assertEquals( BIG_GBP_0_00000, result.getRemainder() );
     }
 
     @Test
@@ -63,10 +63,10 @@ public class TestCalculatorMultiply extends AbstractCalculatorTest {
         MoneyCalculator calculator = getCalculator();
         calculator.set( GBP_3_33 );
         calculator.multiply( INT_ZERO );
-        MoneyCalculator.FinalResult result = calculator.result();
+        MoneyCalculator.Result result = calculator.result();
         assertNotNull( result );
         assertEquals( GBP_0_00, result.getValue() );
-        assertEquals( GBP_0_00.toBigMoney(), result.getRemainder() );
+        assertEquals( BIG_GBP_0_00000, result.getRemainder() );
     }
 
     @Test
@@ -74,10 +74,10 @@ public class TestCalculatorMultiply extends AbstractCalculatorTest {
         MoneyCalculator calculator = getCalculator();
         calculator.set( GBP_3_33 );
         calculator.multiply( BIGDEC_ZERO );
-        MoneyCalculator.FinalResult result = calculator.result();
+        MoneyCalculator.Result result = calculator.result();
         assertNotNull( result );
         assertEquals( GBP_0_00, result.getValue() );
-        assertEquals( GBP_0_00.toBigMoney(), result.getRemainder() );
+        assertEquals( BIG_GBP_0_00000, result.getRemainder() );
     }
 
     @Test
@@ -85,10 +85,10 @@ public class TestCalculatorMultiply extends AbstractCalculatorTest {
         MoneyCalculator calculator = getCalculator();
         calculator.set( GBP_3_33 );
         calculator.multiply( INT_3 );
-        MoneyCalculator.FinalResult result = calculator.result();
+        MoneyCalculator.Result result = calculator.result();
         assertNotNull( result );
         assertEquals( GBP_9_99, result.getValue() );
-        assertEquals( GBP_0_00.toBigMoney(), result.getRemainder() );
+        assertEquals( BIG_GBP_0_00000, result.getRemainder() );
     }
 
     @Test
@@ -96,20 +96,20 @@ public class TestCalculatorMultiply extends AbstractCalculatorTest {
         MoneyCalculator calculator = getCalculator();
         calculator.set( GBP_3_33 );
         calculator.multiply( BIGDEC_3 );
-        MoneyCalculator.FinalResult result = calculator.result();
+        MoneyCalculator.Result result = calculator.result();
         assertNotNull( result );
         assertEquals( GBP_9_99, result.getValue() );
-        assertEquals( GBP_0_00.toBigMoney(), result.getRemainder() );
+        assertEquals( BIG_GBP_0_00000, result.getRemainder() );
     }
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test( expected = NullPointerException.class )
     public void testMultiplyNull1 () {
         MoneyCalculator calculator = getCalculator();
         calculator.set( GBP_3_33 );
         calculator.multiply( (Integer)null );
     }
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test( expected = NullPointerException.class )
     public void testMultiplyNull2 () {
         MoneyCalculator calculator = getCalculator();
         calculator.set( GBP_3_33 );

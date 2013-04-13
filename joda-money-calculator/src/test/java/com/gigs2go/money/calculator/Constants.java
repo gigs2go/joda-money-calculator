@@ -43,9 +43,12 @@ public interface Constants {
 
     /* Remainders */
     public static final BigMoney BIG_GBP_M0_00115 = BigMoney.parse( "GBP -0.00115" );
-    public static final BigMoney BIG_GBP_M0_00889226 = BigMoney.parse( "GBP -0.00889226" );
+    public static final BigMoney BIG_GBP_M0_00890 = BigMoney.parse( "GBP -0.00890" );
+    public static final BigMoney BIG_GBP_0_00000 = BigMoney.parse( "GBP 0.00000" );
     public static final BigMoney BIG_GBP_0_00885 = BigMoney.parse( "GBP 0.00885" );
     public static final BigMoney BIG_GBP_0_00110774 = BigMoney.parse( "GBP 0.00110774" );
+    public static final BigMoney BIG_GBP_0_00110 = BigMoney.parse( "GBP 0.00110" );
+    public static final BigMoney BIG_GBP_0_00111 = BigMoney.parse( "GBP 0.00111" );
 
     /* Yen */
     public static final Money JPY_000 = Money.parse( "JPY 000" );

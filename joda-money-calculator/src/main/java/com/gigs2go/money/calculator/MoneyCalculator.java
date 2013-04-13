@@ -9,68 +9,95 @@ import org.joda.money.Money;
 
 /**
  * <p>
- * A MoneyCalculator is a stateful representation of a series of operations with
- * Money objects.<br/>
+ * A MoneyCalculator is a stateful representation of a sequence of operations
+ * with Money objects.<br/>
+ * It is <b>NOT</b> thread-safe, and should used appropriately.<br/>
+ * Internally, operations are performed using (at least) the 'remainderScale',
+ * which is initially set to the scale of the CurrencyUnit of the Money being
+ * calculated + 3, and the RoundingMode of HALF_UP.<br/>
+ * Either of these can be changed.
  * </p>
- * <p>
- * All internal calculations are done using variable-precision BigMoney's, so no
- * rounding is performed during a sequence.
- * </p>
- * <p>
- * There is <b>NO</b> provision for division! If you wish to divide a Money,
- * please use a BigDecimal multiplier. This is because division can result in
- * 'non-terminating decimal expansions'.<br/>
- * Consequently, to divide by a number, create a BigDecimal by using the inverse
- * and specifying the required scale and rounding mode -<br/>
- * <code><br/>
- *   BigDecimal oneThird = new BigDecimal(1).divide(new BigDecimal(3),5,RoundingMode.UP);<br/>
- *   MoneyCalculator.multiply(oneThird);<br/>
- * </code>
- * <p>
  * When result() is called, the currently active RoundingMode is applied. If
  * result(RoundingMode) is used, the given RoundingMode will be applied. Note
  * that the remainder may be negative (depending on the chosen RoundingMode).
+ * The Result.value is a Money object appropriately scaled for the CurrencyUnit.
+ * The Result.remainder is a BigMoney object scaled at the Calculator's
+ * remainderScale (rounded using the RoundingMode)</p>
+ * <p>
+ * All internal calculations are done using variable-precision BigMoney's.
  * </p>
  * <p>
  * Once the Calculator has been set - either explicitly or implicitly - all
  * further operations are performed using the same CurrencyUnit (where
  * applicable). Any other CurrencyUnit will result in a
- * CurrencyMismatchException.
+ * CurrencyMismatchException (as per Money).<br/>
+ * NullPointerExceptions will be thrown if necessary.
  * </p>
  * 
- * @see {@link Money}
- * @see {@link BigMoney}
- * @see {@link CurrencyUnit}
- * @see {@link BigDecimal}
- * @see {@link RoundingMode}
+ * @see Money
+ * @see BigMoney
+ * @see CurrencyUnit
+ * @see BigDecimal
+ * @see RoundingMode
  */
 public class MoneyCalculator {
-    PartialResult currentResult = null;
+    private static final int REMAINDER_SCALE = 3;
+
+    private BigMoney currentValue = null;
+    private RoundingMode roundingMode = RoundingMode.HALF_UP;
+    private int remainderScale = REMAINDER_SCALE;
 
     /**
-     * Create a new MoneyCalculator with a default RoundingMode of 'HALF_UP'
+     * Create a new MoneyCalculator with a default remainderScale of 3 and a
+     * default RoundingMode of 'HALF_UP'
      */
     public MoneyCalculator() {
-        this.currentResult = new PartialResult( RoundingMode.HALF_UP );
+        this( REMAINDER_SCALE, RoundingMode.HALF_UP );
     }
 
     /**
-     * Create a new MoneyCalculator with the given RoundingMode
+     * Create a new MoneyCalculator with a default remainderScale of 3 and the
+     * given RoundingMode
      * 
      * @param roundingMode
      */
     public MoneyCalculator( RoundingMode roundingMode ) {
-        this.currentResult = new PartialResult( roundingMode );
+        this( REMAINDER_SCALE, roundingMode );
     }
 
     /**
-     * Clear the current state of the Calculator
+     * Create a new MoneyCalculator with the given remainderScale and
+     * RoundingMode
+     * 
+     * @param roundingMode
+     */
+    public MoneyCalculator( int remainderScale, RoundingMode roundingMode ) {
+        this.setRemainderScale( remainderScale );
+        this.roundingMode = roundingMode;
+    }
+
+    /**
+     * Clears the Calculator value - RemainderScale and RoundingMode are
+     * retained
      * 
      * @return A newly initialised {@link MoneyCalculator}
      */
     public MoneyCalculator clear () {
-        this.currentResult = new PartialResult( this.currentResult.roundingMode );
+        currentValue = null;
         return this;
+    }
+
+    /**
+     * Increases the remainderScale if the given one is bigger than the current
+     * one
+     * 
+     * @param remainderScale
+     *            The new remainder scale
+     */
+    public void setRemainderScale ( int remainderScale ) {
+        if ( remainderScale > this.remainderScale ) {
+            this.remainderScale = remainderScale;
+        }
     }
 
     /**
@@ -103,34 +130,10 @@ public class MoneyCalculator {
      * @return An initialised {@link MoneyCalculator}
      */
     public MoneyCalculator set ( Money money ) {
-        checkNotNull( money );
         this.clear();
-        this.currentResult.value = money.toBigMoney();
+        this.currentValue = money.toBigMoney().withScale( money.getScale() + REMAINDER_SCALE );
+        this.setRemainderScale( this.currentValue.getScale() );
         return this;
-    }
-
-    /**
-     * Obtains the result of any/all preceding calculations since the last
-     * {@link #clear()}
-     * 
-     * @return the result
-     */
-    public FinalResult result () {
-        return currentResult.toResult();
-    }
-
-    /**
-     * Obtains the result of any/all preceding calculations since the last
-     * {@link #clear()}
-     * 
-     * @param roundingMode
-     *            The RoundingMode used to calculate the result. See
-     *            {@link BigDecimal} for details.
-     * 
-     * @return the result
-     */
-    public FinalResult result ( RoundingMode roundingMode ) {
-        return currentResult.toResult( roundingMode );
     }
 
     /**
@@ -144,8 +147,6 @@ public class MoneyCalculator {
      * @return The {@link MoneyCalculator} for further operations
      */
     public MoneyCalculator add ( Money money1, Money money2 ) {
-        checkNotNull( money1 );
-        checkNotNull( money2 );
         this.clear();
         this.set( money1 );
         return this.add( money2 );
@@ -159,8 +160,7 @@ public class MoneyCalculator {
      * @return The {@link MoneyCalculator} for further operations
      */
     public MoneyCalculator add ( Money amount ) {
-        checkNotNull( amount );
-        this.currentResult.value = this.currentResult.value.plus( amount );
+        this.currentValue = this.currentValue.plus( amount );
         return this;
     }
 
@@ -175,8 +175,6 @@ public class MoneyCalculator {
      * @return The {@link MoneyCalculator} for further operations
      */
     public MoneyCalculator subtract ( Money from, Money amount ) {
-        checkNotNull( from );
-        checkNotNull( amount );
         this.clear();
         this.set( from );
         return this.subtract( amount );
@@ -190,14 +188,13 @@ public class MoneyCalculator {
      * @return The {@link MoneyCalculator} for further operations
      */
     public MoneyCalculator subtract ( Money amount ) {
-        checkNotNull( amount );
-        this.currentResult.value = this.currentResult.value.minus( amount );
+        this.currentValue = this.currentValue.minus( amount );
         return this;
     }
 
     /**
      * Performs an implicit {@link #clear()}, {@link #set(Money)},
-     * {@link #multiply(Integer)}
+     * {@link #multiply(long)}
      * 
      * @param money
      *            The initial value for the Calculator
@@ -205,24 +202,33 @@ public class MoneyCalculator {
      *            The amount to multiply the initial value by
      * @return The {@link MoneyCalculator} for further operations
      */
-    public MoneyCalculator multiply ( Money money, Integer by ) {
-        checkNotNull( money );
-        checkNotNull( by );
+    public MoneyCalculator multiply ( Money money, long by ) {
         this.clear();
         this.set( money );
         return this.multiply( by );
     }
 
     /**
-     * Multiplies the current amount by the given Integer
+     * Multiplies the current amount by the given long
      * 
      * @param by
      *            The value to multiply the current amount by
      * @return The {@link MoneyCalculator} for further operations
      */
-    public MoneyCalculator multiply ( Integer by ) {
-        checkNotNull( by );
-        this.currentResult.value = this.currentResult.value.multipliedBy( by.longValue() );
+    public MoneyCalculator multiply ( long by ) {
+        this.currentValue = this.currentValue.multipliedBy( by );
+        return this;
+    }
+
+    /**
+     * Multiplies the current amount by the given double
+     * 
+     * @param by
+     *            The value to multiply the current amount by
+     * @return The {@link MoneyCalculator} for further operations
+     */
+    public MoneyCalculator multiply ( double by ) {
+        this.currentValue = this.currentValue.multipliedBy( by );
         return this;
     }
 
@@ -234,54 +240,116 @@ public class MoneyCalculator {
      * @return The {@link MoneyCalculator} for further operations
      */
     public MoneyCalculator multiply ( BigDecimal by ) {
-        checkNotNull( by );
-        this.currentResult.value = this.currentResult.value.multipliedBy( by );
+        this.currentValue = this.currentValue.multipliedBy( by );
         return this;
     }
 
     /**
-     * Validates that the money object specified is not null
+     * Performs an implicit {@link #clear()}, {@link #set(Money)},
+     * {@link #divide(long)}
      * 
      * @param money
-     *            the object to check, not null
-     * @throws NullPointerException
-     *             if the input value is null
+     *            The initial value for the Calculator
+     * @param by
+     *            The amount to multiply the initial value by
+     * @return The {@link MoneyCalculator} for further operations
      */
-    private void checkNotNull ( Money money ) {
-        if ( money == null ) {
-            throw new IllegalArgumentException( "Money value may not be null" );
-        }
+    public MoneyCalculator divide ( Money money, long by ) {
+        this.clear();
+        this.set( money );
+        return this.divide( by );
     }
 
     /**
-     * Validates that the Integer object specified is not null
+     * Divides the current amount by the given long
      * 
-     * @param integer
-     *            the object to check, not null
-     * @throws NullPointerException
-     *             if the input value is null
+     * @param by
+     *            The value to divide the current amount by
+     * @return The {@link MoneyCalculator} for further operations
      */
-    private void checkNotNull ( Integer integer ) {
-        if ( integer == null ) {
-            throw new IllegalArgumentException( "Integer value may not be null" );
-        }
+    public MoneyCalculator divide ( long by ) {
+        this.currentValue = this.currentValue.dividedBy( by, roundingMode );
+        return this;
     }
 
     /**
-     * Validates that the BigDecimal object specified is not null
+     * Performs an implicit {@link #clear()}, {@link #set(Money)},
+     * {@link #divide(double)}
      * 
-     * @param integer
-     *            the object to check, not null
-     * @throws NullPointerException
-     *             if the input value is null
+     * @param money
+     *            The initial value for the Calculator
+     * @param by
+     *            The amount to multiply the initial value by
+     * @return The {@link MoneyCalculator} for further operations
      */
-    private void checkNotNull ( BigDecimal integer ) {
-        if ( integer == null ) {
-            throw new IllegalArgumentException( "BigDecimal value may not be null" );
-        }
+    public MoneyCalculator divide ( Money money, double by ) {
+        this.clear();
+        this.set( money );
+        return this.divide( by );
     }
 
-    class FinalResult {
+    /**
+     * Divides the current amount by the given double
+     * 
+     * @param by
+     *            The value to divide the current amount by
+     * @return The {@link MoneyCalculator} for further operations
+     */
+    public MoneyCalculator divide ( double by ) {
+        this.currentValue = this.currentValue.dividedBy( by, roundingMode );
+        return this;
+    }
+
+    /**
+     * Divides the current amount by the given BigDecimal
+     * 
+     * @param by
+     *            The value to divide the current amount by
+     * @return The {@link MoneyCalculator} for further operations
+     */
+    public MoneyCalculator divide ( BigDecimal by ) {
+        this.currentValue = this.currentValue.dividedBy( by, roundingMode );
+        return this;
+    }
+
+    /**
+     * Obtains the result of any/all preceding calculations since the last
+     * {@link #clear()}
+     * 
+     * @return the result
+     */
+    public Result result () {
+        return toResult( this.roundingMode );
+    }
+
+    /**
+     * Obtains the result of any/all preceding calculations since the last
+     * {@link #clear()}
+     * 
+     * @param roundingMode
+     *            The RoundingMode used to calculate the result. See
+     *            {@link BigDecimal} for details.
+     * 
+     * @return the result
+     */
+    public Result result ( RoundingMode roundingMode ) {
+        return toResult( roundingMode );
+    }
+
+    /**
+     * @param roundingMode
+     *            The BigDecimal RoundingMode to use
+     * @return the result. NB The remainder may be negative depending on the
+     *         value and the RoundingMode
+     */
+    private Result toResult ( RoundingMode roundingMode ) {
+        Result result = new Result();
+        result.value = (currentValue != null ? currentValue.withCurrencyScale( roundingMode ).toMoney() : null);
+        result.remainder = (currentValue != null ? currentValue.minus( result.value ).withScale( remainderScale, roundingMode ) : null);
+        return result;
+    }
+
+    class Result {
         private Money value = null;
         private BigMoney remainder = null;
 
@@ -300,35 +368,4 @@ public class MoneyCalculator {
         }
     }
 
-    private class PartialResult {
-        BigMoney value = null;
-        RoundingMode roundingMode = null;
-
-        PartialResult( RoundingMode roundingMode ) {
-            this.roundingMode = roundingMode;
-        }
-
-        /**
-         * @return the result using the initial RoundingMode of the
-         *         MoneyCalculator
-         */
-        FinalResult toResult () {
-            FinalResult result = toResult( this.roundingMode );
-            return result;
-        }
-
-        /**
-         * @param roundingMode
-         *            The BigDecimal RoundingMode to use
-         * @return the result. NB The remainder may be negative depending on the
-         *         value and the RoundingMode
-         */
-        FinalResult toResult ( RoundingMode roundingMode ) {
-            FinalResult result = new FinalResult();
-            result.value = (value != null ? value.withCurrencyScale( roundingMode ).toMoney() : null);
-            result.remainder = (value != null ? value.minus( result.value ) : null);
-            return result;
-        }
-
-    }
 }

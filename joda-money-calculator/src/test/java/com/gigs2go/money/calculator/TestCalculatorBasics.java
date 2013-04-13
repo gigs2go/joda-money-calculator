@@ -28,13 +28,13 @@ public class TestCalculatorBasics extends AbstractCalculatorTest {
     public void testClear () {
         MoneyCalculator calculator = getCalculator();
         calculator.clear();
-        MoneyCalculator.FinalResult result = calculator.result();
+        MoneyCalculator.Result result = calculator.result();
         assertNotNull( result );
         assertEquals( null, result.getValue() );
         assertEquals( null, result.getRemainder() );
     }
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test( expected = NullPointerException.class )
     public void testSetNull () {
         MoneyCalculator calculator = getCalculator();
         calculator.set( null );
@@ -44,20 +44,20 @@ public class TestCalculatorBasics extends AbstractCalculatorTest {
     public void testSetZero () {
         MoneyCalculator calculator = getCalculator();
         calculator.set( GBP_0_00 );
-        MoneyCalculator.FinalResult result = calculator.result();
+        MoneyCalculator.Result result = calculator.result();
         assertNotNull( result );
         assertEquals( GBP_0_00, result.getValue() );
-        assertEquals( GBP_0_00.toBigMoney(), result.getRemainder() );
+        assertEquals( BIG_GBP_0_00000, result.getRemainder() );
     }
 
     @Test
     public void testSetValue () {
         MoneyCalculator calculator = getCalculator();
         calculator.set( GBP_1243_21 );
-        MoneyCalculator.FinalResult result = calculator.result();
+        MoneyCalculator.Result result = calculator.result();
         assertNotNull( result );
         assertEquals( GBP_1243_21, result.getValue() );
-        assertEquals( GBP_0_00.toBigMoney(), result.getRemainder() );
+        assertEquals( BIG_GBP_0_00000, result.getRemainder() );
     }
 
 }

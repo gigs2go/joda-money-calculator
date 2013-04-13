@@ -29,10 +29,10 @@ public class TestCalculatorSubtract extends AbstractCalculatorTest {
     public void testSubtractZeroes1 () {
         MoneyCalculator calculator = getCalculator();
         calculator.subtract( GBP_0_00, GBP_0_00 );
-        MoneyCalculator.FinalResult result = calculator.result();
+        MoneyCalculator.Result result = calculator.result();
         assertNotNull( result );
         assertEquals( GBP_0_00, result.getValue() );
-        assertEquals( GBP_0_00.toBigMoney(), result.getRemainder() );
+        assertEquals( BIG_GBP_0_00000, result.getRemainder() );
     }
 
     @Test( expected = CurrencyMismatchException.class )
@@ -47,13 +47,13 @@ public class TestCalculatorSubtract extends AbstractCalculatorTest {
         calculator.subtract( JPY_000, GBP_0_00 );
     }
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test( expected = NullPointerException.class )
     public void testSubtractNulls1 () {
         MoneyCalculator calculator = getCalculator();
         calculator.subtract( null, GBP_0_00 );
     }
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test( expected = NullPointerException.class )
     public void testSubtractNulls2 () {
         MoneyCalculator calculator = getCalculator();
         calculator.subtract( GBP_0_00, null );
@@ -63,10 +63,10 @@ public class TestCalculatorSubtract extends AbstractCalculatorTest {
     public void testSubtractValues1 () {
         MoneyCalculator calculator = getCalculator();
         calculator.subtract( GBP_3_33, GBP_1_23 );
-        MoneyCalculator.FinalResult result = calculator.result();
+        MoneyCalculator.Result result = calculator.result();
         assertNotNull( result );
         assertEquals( GBP_2_10, result.getValue() );
-        assertEquals( GBP_0_00.toBigMoney(), result.getRemainder() );
+        assertEquals( BIG_GBP_0_00000, result.getRemainder() );
     }
 
     @Test( expected = CurrencyMismatchException.class )
@@ -86,10 +86,10 @@ public class TestCalculatorSubtract extends AbstractCalculatorTest {
         MoneyCalculator calculator = getCalculator();
         calculator.set( GBP_3_33 );
         calculator.subtract( GBP_1_23 );
-        MoneyCalculator.FinalResult result = calculator.result();
+        MoneyCalculator.Result result = calculator.result();
         assertNotNull( result );
         assertEquals( GBP_2_10, result.getValue() );
-        assertEquals( GBP_0_00.toBigMoney(), result.getRemainder() );
+        assertEquals( BIG_GBP_0_00000, result.getRemainder() );
     }
 
     @Test( expected = CurrencyMismatchException.class )
@@ -104,10 +104,10 @@ public class TestCalculatorSubtract extends AbstractCalculatorTest {
         MoneyCalculator calculator = getCalculator();
         calculator.set( GBP_3_33 );
         calculator.subtract( GBP_0_00 );
-        MoneyCalculator.FinalResult result = calculator.result();
+        MoneyCalculator.Result result = calculator.result();
         assertNotNull( result );
         assertEquals( GBP_3_33, result.getValue() );
-        assertEquals( GBP_0_00.toBigMoney(), result.getRemainder() );
+        assertEquals( BIG_GBP_0_00000, result.getRemainder() );
     }
 
     @Test( expected = CurrencyMismatchException.class )
@@ -117,7 +117,7 @@ public class TestCalculatorSubtract extends AbstractCalculatorTest {
         calculator.subtract( JPY_000 );
     }
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test( expected = NullPointerException.class )
     public void testSubtractNull () {
         MoneyCalculator calculator = getCalculator();
         calculator.set( GBP_3_33 );
