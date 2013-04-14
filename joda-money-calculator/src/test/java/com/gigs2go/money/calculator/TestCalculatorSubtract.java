@@ -7,7 +7,7 @@ import org.joda.money.CurrencyMismatchException;
 import org.junit.Test;
 
 /**
- * Test Calculator. All +ve values. All integer ops.
+ * Test Calculator subtract operations
  */
 public class TestCalculatorSubtract extends AbstractCalculatorTest {
     @Test

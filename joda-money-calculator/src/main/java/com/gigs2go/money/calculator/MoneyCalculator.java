@@ -97,6 +97,9 @@ public class MoneyCalculator {
     public void setRemainderScale ( int remainderScale ) {
         if ( remainderScale > this.remainderScale ) {
             this.remainderScale = remainderScale;
+            if ( this.currentValue != null ) {
+                this.currentValue = this.currentValue.withScale( this.remainderScale );
+            }
         }
     }
 
@@ -131,7 +134,11 @@ public class MoneyCalculator {
      */
     public MoneyCalculator set ( Money money ) {
         this.clear();
-        this.currentValue = money.toBigMoney().withScale( money.getScale() + REMAINDER_SCALE );
+        int scale = money.getScale() + REMAINDER_SCALE;
+        if ( remainderScale > scale ) {
+            scale = remainderScale;
+        }
+        this.currentValue = money.toBigMoney().withScale( scale );
         this.setRemainderScale( this.currentValue.getScale() );
         return this;
     }
@@ -209,6 +216,38 @@ public class MoneyCalculator {
     }
 
     /**
+     * Performs an implicit {@link #clear()}, {@link #set(Money)},
+     * {@link #multiply(double)}
+     * 
+     * @param money
+     *            The initial value for the Calculator
+     * @param by
+     *            The amount to multiply the initial value by
+     * @return The {@link MoneyCalculator} for further operations
+     */
+    public MoneyCalculator multiply ( Money money, double by ) {
+        this.clear();
+        this.set( money );
+        return this.multiply( by );
+    }
+
+    /**
+     * Performs an implicit {@link #clear()}, {@link #set(Money)},
+     * {@link #multiply(BigDecimal)}
+     * 
+     * @param money
+     *            The initial value for the Calculator
+     * @param by
+     *            The amount to multiply the initial value by
+     * @return The {@link MoneyCalculator} for further operations
+     */
+    public MoneyCalculator multiply ( Money money, BigDecimal by ) {
+        this.clear();
+        this.set( money );
+        return this.multiply( by );
+    }
+
+    /**
      * Multiplies the current amount by the given long
      * 
      * @param by
@@ -261,18 +300,6 @@ public class MoneyCalculator {
     }
 
     /**
-     * Divides the current amount by the given long
-     * 
-     * @param by
-     *            The value to divide the current amount by
-     * @return The {@link MoneyCalculator} for further operations
-     */
-    public MoneyCalculator divide ( long by ) {
-        this.currentValue = this.currentValue.dividedBy( by, roundingMode );
-        return this;
-    }
-
-    /**
      * Performs an implicit {@link #clear()}, {@link #set(Money)},
      * {@link #divide(double)}
      * 
@@ -286,6 +313,34 @@ public class MoneyCalculator {
         this.clear();
         this.set( money );
         return this.divide( by );
+    }
+
+    /**
+     * Performs an implicit {@link #clear()}, {@link #set(Money)},
+     * {@link #divide(BigDecimal)}
+     * 
+     * @param money
+     *            The initial value for the Calculator
+     * @param by
+     *            The amount to multiply the initial value by
+     * @return The {@link MoneyCalculator} for further operations
+     */
+    public MoneyCalculator divide ( Money money, BigDecimal by ) {
+        this.clear();
+        this.set( money );
+        return this.divide( by );
+    }
+
+    /**
+     * Divides the current amount by the given long
+     * 
+     * @param by
+     *            The value to divide the current amount by
+     * @return The {@link MoneyCalculator} for further operations
+     */
+    public MoneyCalculator divide ( long by ) {
+        this.currentValue = this.currentValue.dividedBy( by, roundingMode );
+        return this;
     }
 
     /**

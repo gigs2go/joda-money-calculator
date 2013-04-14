@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
 /**
- * Test Calculator. All +ve values. All integer ops.
+ * Test Calculator basics
  */
 public class TestCalculatorBasics extends AbstractCalculatorTest {
     @Test

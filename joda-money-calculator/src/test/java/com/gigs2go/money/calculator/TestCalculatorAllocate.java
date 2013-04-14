@@ -9,7 +9,7 @@ import org.junit.Test;
 import com.gigs2go.money.calculator.allocators.AllocatorStrategy;
 
 /**
- * Test Calculator.
+ * Test Calculator allocate operations
  */
 public class TestCalculatorAllocate extends AbstractCalculatorTest {
     @Test( expected = IllegalArgumentException.class )

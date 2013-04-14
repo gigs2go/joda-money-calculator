@@ -7,7 +7,7 @@ import org.joda.money.CurrencyMismatchException;
 import org.junit.Test;
 
 /**
- * Test Calculator. All +ve values. All integer ops.
+ * Test Calculator add operations
  */
 public class TestCalculatorAdd extends AbstractCalculatorTest {
     @Test
@@ -108,4 +108,13 @@ public class TestCalculatorAdd extends AbstractCalculatorTest {
         calculator.set( GBP_3_33 );
         calculator.add( null );
     }
+
+    @Test
+    public void testAddSequence1 () {
+        MoneyCalculator calculator = getCalculator();
+        MoneyCalculator.Result result = calculator.add( GBP_3_33, GBP_3_33 ).add( GBP_3_33 ).add( GBP_4_56 ).result();
+        assertEquals( GBP_14_55, result.getValue() );
+        assertEquals( BIG_GBP_0_00000, result.getRemainder() );
+    }
+
 }

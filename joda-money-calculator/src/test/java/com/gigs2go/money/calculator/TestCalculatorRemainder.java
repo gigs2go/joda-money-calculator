@@ -8,7 +8,7 @@ import java.math.RoundingMode;
 import org.junit.Test;
 
 /**
- * Test Calculator. All +ve values. All integer ops.
+ * Test Calculator remainder operations
  */
 public class TestCalculatorRemainder extends AbstractCalculatorTest {
     @Test
